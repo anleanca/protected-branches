@@ -43,6 +43,37 @@ def publishHTMLReports(reportName) {
                  reportName           : reportName])
 }
 
+
+String jobName = "bps-reporting-db"
+
+def checkJobBuildRunned(jobName) {
+
+    def job = Jenkins.instance.getItem(jobName)
+
+    if (!job) {
+        error("cannot find upstream job ${jobName}")
+    }
+
+    //println(job.getAllJobs())
+    for(branchJob in job.getAllJobs()) {
+        println(branchJob)
+
+        def latestBuild = branchJob.getBuilds().get(0)
+
+        //println(getBuildResult(latestBuild))
+
+        def result = latestBuild.getResult()
+        println(result)
+
+        if (result == null) {
+            return true
+        }
+    }
+
+    return false
+}
+
+
 /* Declarative pipeline must be enclosed within a pipeline block */
 pipeline {
 //    // agent section specifies where the entire Pipeline will execute in the Jenkins environment
@@ -89,6 +120,9 @@ pipeline {
          */
         stage('Prepare') {
             steps {
+
+                println(checkJobBuildRunned(jobName))
+
                 // GIT submodule recursive checkout
                 checkout scm: [
                         $class: 'GitSCM',
