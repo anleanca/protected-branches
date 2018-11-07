@@ -158,7 +158,7 @@ pipeline {
                      * jdk: Select a JDK installation
                      * maven: Select a Maven installation
                      */
-                    withMaven(globalMavenSettingsConfig: "$mavenConfig", jdk: "$JDKVersion", maven: "$mavenLocation") {
+                    withMaven(globalMavenSettingsConfig: "$mavenConfig", jdk: "$JDKVersion" /*, maven: "$mavenLocation"*/) {
                         /**
                          * To proceed to the next stage even if the current stage failed,
                          * enclose this stage in a try-catch block
