@@ -3,7 +3,7 @@ def getProjectName() {
 }
 
 def getJDKVersion() {
-    return 'jdk1.8.0_192'
+    return 'jdk1.8'
 }
 
 def getMavenConfig() {
