@@ -11,7 +11,8 @@ def getMavenConfig() {
 }
 
 def getMavenLocation() {
-    return 'M2_HOME'
+//    return 'M2_HOME'
+    return 'MAVEN_HOME'
 }
 
 def getEnvironment() {
