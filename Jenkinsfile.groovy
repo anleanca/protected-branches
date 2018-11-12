@@ -50,7 +50,6 @@ String githubRepositoryName = "anleanca/protected-branches"
 
 
 def checkJobBuildRunned(jobName) {
-
     def job = Jenkins.instance.getItem(jobName)
 
     if (!job) {
