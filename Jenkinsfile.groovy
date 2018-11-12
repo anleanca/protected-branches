@@ -241,7 +241,9 @@ pipeline {
                             echo 'Run integration tests'
                         },
                         "Sonar Scan": {
-                            sh "mvn sonar:sonar"
+                            withSonarQubeEnv('sonar'){
+                                sh "mvn sonar:sonar"
+                            }
                         }
                 )
             }
