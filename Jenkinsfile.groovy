@@ -231,20 +231,20 @@ pipeline {
         }
 
         stage('Quality Analysis') {
-            steps {
-                /**
-                 * makes use of one single agent, and spins off 2 runs of the steps inside each parallel branch
-                 */
-                parallel(
-                        "Integration Test": {
-                            echo 'Run integration tests'
-                        },
-                        "Sonar Scan": {
-                            withSonarQubeEnv(installationName:"$sonarConfig") {
-                                sh "mvn sonar:sonar"
-                            }
+            parallel {
+                stage("Integration Test") {
+                    steps {
+                        echo 'Run integration tests'
+                    }
+                }
+
+                stage("Sonar Scan") {
+                    steps {
+                        withSonarQubeEnv(installationName: "$sonarConfig") {
+                            sh "mvn sonar:sonar"
                         }
-                )
+                    }
+                }
             }
         }
 /**
