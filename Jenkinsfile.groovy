@@ -10,6 +10,10 @@ def getMavenConfig() {
     return 'maven-config'
 }
 
+def getSonarConfig() {
+    return 'sonar'
+}
+
 def getEnvironment() {
     return  'QA\n' +
             'STG\n' +
@@ -236,7 +240,9 @@ pipeline {
                             echo 'Run integration tests'
                         },
                         "Sonar Scan": {
-                            sh "mvn sonar:sonar"
+                            withSonarQubeEnv(installationName:"$sonarConfig") {
+                                sh "mvn sonar:sonar"
+                            }
                         }
                 )
             }
@@ -292,7 +298,6 @@ pipeline {
             }
         }
  /**/
-    }
 
 
     /**
