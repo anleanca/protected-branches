@@ -121,7 +121,7 @@ pipeline {
                                 error 'FAIL'
                             }
                         } catch (err) {
-                            sleep(time:60,unit:"SECONDS")
+                            sleep(time:6,unit:"SECONDS")
                         }
 
                     }
