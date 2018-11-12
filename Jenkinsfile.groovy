@@ -244,10 +244,11 @@ pipeline {
                             httpMode: 'POST',
                             acceptType: 'APPLICATION_JSON',
                             contentType: 'APPLICATION_JSON',
-                            customHeaders:[[name:"Authorization", value: "token ${env.TOKEN}"]],
+                            customHeaders: [[name: "Authorization", value: "token ${env.TOKEN}"]],
                             requestBody: payload
                     println(response)
                 }
+            }
         }
 
         success {
