@@ -154,7 +154,7 @@ pipeline {
                         httpMode: 'POST',
                         acceptType: 'APPLICATION_JSON',
                         contentType: 'APPLICATION_JSON',
-                        customHeaders: [["Authorization":"token ${token}"]]
+                        customHeaders: ["Authorization":"token ${token}"]
                         requestBody: payload
                     
                     
