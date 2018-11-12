@@ -254,36 +254,6 @@ pipeline {
                 )
             }
         }
-
-        stage('Transfer Script') {
-            steps {
-                // provide SSH credentials to builds via a ssh-agent in Jenkins
-                sshagent(['test-key']) {
-                    sh "scp test.sh ${identity}:${path}"
-                }
-            }
-        }
-
-        stage('Execute Script') {
-            steps {
-                script {
-                    // provide SSH credentials to builds via a ssh-agent in Jenkins
-                    sshagent(['test-key']) {
-                        // AWS credentials binding - each binding will define an environment variable active within the scope of the step
-                        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
-                                          accessKeyVariable: 'AWS_ACCESS_KEY',
-                                          credentialsId: 'test',
-                                          secretKeyVariable: 'AWS_SECRET_KEY']]) {
-                            sh """
-                                ssh ${identity} "chmod 755 test.sh && ./test.sh --aws-access-key ${AWS_ACCESS_KEY} " \
-                                    "--aws-secret-key ${AWS_SECRET_KEY}"
-                            """
-                        }
-                    }
-                }
-            }
-        }
-
     }
 
     /**
@@ -334,11 +304,11 @@ pipeline {
     }]
 }"""
                 // publish message to webhook
-                httpRequest httpMode: 'POST',
-                        acceptType: 'APPLICATION_JSON',
-                        contentType: 'APPLICATION_JSON',
-                        url: "${webhookUrl}",
-                        requestBody: payload
+//                httpRequest httpMode: 'POST',
+//                        acceptType: 'APPLICATION_JSON',
+//                        contentType: 'APPLICATION_JSON',
+//                        url: "${webhookUrl}",
+//                        requestBody: payload
             }
         }
     }
