@@ -46,7 +46,8 @@ def publishHTMLReports(reportName) {
 
 String jobName = "bps-reporting-db"
 String gitHubCredentialsId = "352dfae7-1f12-40ad-b64c-c69162beecdb"
-
+String githubRepositoryName = "anleanca/protected-branches"
+def scmInfo = null
 
 def checkJobBuildRunned(jobName) {
 
@@ -126,7 +127,7 @@ pipeline {
                 println(checkJobBuildRunned(jobName))
 
                 // GIT submodule recursive checkout
-                checkout scm: [
+                scmInfo = checkout scm: [
                         $class: 'GitSCM',
                         branches: scm.branches,
                         doGenerateSubmoduleConfigurations: false,
@@ -151,14 +152,17 @@ pipeline {
   description:"Jenkins build"
 }
 """
-                withCredentials([[$class: 'StringBinding', credentialsId: gitHubCredentialsId, variable: 'TOKEN']]) {
-                    def response = httpRequest url: "${webhookUrl}/repos/${repo_name}/statuses/${sha}?token=${token}",
+            withCredentials([[$class: 'StringBinding', credentialsId: gitHubCredentialsId, variable: 'TOKEN']]) {
+                    def response = httpRequest url: "${webhookUrl}/repos/${githubRepositoryName}/statuses/${scmInfo.GIT_COMMIT}?token=${env.TOKEN}",
                         httpMode: 'POST',
                         acceptType: 'APPLICATION_JSON',
                         contentType: 'APPLICATION_JSON',
                         requestBody: payload
                     println(response)
-                }
+            
+                echo "${BUILD_URL}"
+                sh "githubstatus.py --token ${env.TOKEN} --repo ${githubRepositoryName}  status --status=success --sha ${scmInfo.GIT_COMMIT}"
+            }                    
                     
                     if(params.USE_INPUT_DUNS) {
                         configFileProvider([configFile(fileId: '609999e4-446c-4705-a024-061ed7ca2a11',
