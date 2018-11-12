@@ -212,18 +212,7 @@ pipeline {
     post {
         // Run regardless of the completion status of the Pipeline run
         always {
-            // send email
-            // email template to be loaded from managed files
-//            emailext body: '${SCRIPT,template="managed:EmailTemplate"}',
-//                    attachLog: true,
-//                    compressLog: true,
-//                    attachmentsPattern: "$reportZipFile",
-//                    mimeType: 'text/html',
-//                    subject: "Pipeline Build ${BUILD_NUMBER}",
-//                    to: "${params.EMAIL_RECIPIENTS}"
-
-            // clean up workspace
-            deleteDir()
+            //
         }
         // Only run the steps if the current Pipeline’s or stage’s run has a "success" status
         success {
