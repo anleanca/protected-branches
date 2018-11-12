@@ -47,7 +47,7 @@ def publishHTMLReports(reportName) {
 String jobName = "bps-reporting-db"
 String gitHubCredentialsId = "352dfae7-1f12-40ad-b64c-c69162beecdb"
 String githubRepositoryName = "anleanca/protected-branches"
-def scmInfo = null
+
 
 def checkJobBuildRunned(jobName) {
 
@@ -125,7 +125,7 @@ pipeline {
             steps {
 
                 println(checkJobBuildRunned(jobName))
-
+                def scmInfo = null
                 // GIT submodule recursive checkout
                 scmInfo = checkout scm: [
                         $class: 'GitSCM',
