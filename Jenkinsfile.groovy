@@ -132,21 +132,6 @@ pipeline {
                     ]
                     // copy managed files to workspace
 
-                    def webhookUrl = "https://api.github.com"
-                    String repo_name = "anleanca/protected-branches"
-
-                    String payload = """{"state": "success", "description": "Jenkins build"}"""
-                    withCredentials([[$class: 'StringBinding', credentialsId: gitHubCredentialsId, variable: 'TOKEN']]) {
-                        /**/
-                        def response = httpRequest url: "${webhookUrl}/repos/${githubRepositoryName}/statuses/${scmInfo.GIT_COMMIT}",
-                                httpMode: 'POST',
-                                acceptType: 'APPLICATION_JSON',
-                                contentType: 'APPLICATION_JSON',
-                                customHeaders:[[name:"Authorization", value: "token ${env.TOKEN}"]],
-                                requestBody: payload
-                        println(response)
-
-                    }
                 }
             }
         }
@@ -218,6 +203,15 @@ pipeline {
                 )
             }
         }
+
+        stage('Set GitHub SUCCESS') {
+            node {
+                withCredentials([[$class: 'StringBinding', credentialsId: gitHubCredentialsId, variable: 'TOKEN']]) {
+                    echo "${BUILD_URL}"
+                    sh "githubstatus.py --token ${env.TOKEN} --repo ${githubRepositoryName}  status --status=success --sha ${scmInfo.GIT_COMMIT}"
+                }
+            }
+        }
     }
 
     /**
@@ -229,13 +223,13 @@ pipeline {
         always {
             // send email
             // email template to be loaded from managed files
-            emailext body: '${SCRIPT,template="managed:EmailTemplate"}',
-                    attachLog: true,
-                    compressLog: true,
-                    attachmentsPattern: "$reportZipFile",
-                    mimeType: 'text/html',
-                    subject: "Pipeline Build ${BUILD_NUMBER}",
-                    to: "${params.EMAIL_RECIPIENTS}"
+//            emailext body: '${SCRIPT,template="managed:EmailTemplate"}',
+//                    attachLog: true,
+//                    compressLog: true,
+//                    attachmentsPattern: "$reportZipFile",
+//                    mimeType: 'text/html',
+//                    subject: "Pipeline Build ${BUILD_NUMBER}",
+//                    to: "${params.EMAIL_RECIPIENTS}"
 
             // clean up workspace
             deleteDir()
@@ -243,36 +237,21 @@ pipeline {
         // Only run the steps if the current Pipeline’s or stage’s run has a "success" status
         success {
             script {
-                def payload = """
-{
-    "@type": "MessageCard",
-    "@context": "http://schema.org/extensions",
-    "themeColor": "0076D7",
-    "summary": "Test Message",
-    "sections": [{
-        "activityTitle": "Test Message",
-        "activitySubtitle": "",
-        "activityImage": "https://cwiki.apache.org/confluence/download/attachments/30737784/oozie_47x200.png",
-        "facts": [{
-            "name": "ENVIRONMENT",
-            "value": "${params.ENVIRONMENT}"
-        }],
-        "markdown": true
-    }],
-    "potentialAction": [{
-        "@type": "OpenUri",
-        "name": "View Build",
-        "targets": [
-            { "os": "default", "uri": "${BUILD_URL}" }
-        ]
-    }]
-}"""
-                // publish message to webhook
-//                httpRequest httpMode: 'POST',
-//                        acceptType: 'APPLICATION_JSON',
-//                        contentType: 'APPLICATION_JSON',
-//                        url: "${webhookUrl}",
-//                        requestBody: payload
+                def webhookUrl = "https://api.github.com"
+                String repo_name = "anleanca/protected-branches"
+
+                String payload = """{"state": "success", "description": "Jenkins build"}"""
+                withCredentials([[$class: 'StringBinding', credentialsId: gitHubCredentialsId, variable: 'TOKEN']]) {
+                    /**/
+                    def response = httpRequest url: "${webhookUrl}/repos/${githubRepositoryName}/statuses/${scmInfo.GIT_COMMIT}",
+                            httpMode: 'POST',
+                            acceptType: 'APPLICATION_JSON',
+                            contentType: 'APPLICATION_JSON',
+                            customHeaders:[[name:"Authorization", value: "token ${env.TOKEN}"]],
+                            requestBody: payload
+                    println(response)
+                }
+
             }
         }
     }
