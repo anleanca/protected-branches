@@ -114,8 +114,8 @@ pipeline {
          */
         stage('Check DB build') {
             steps {
-                retry (3) {
-                    script {
+                script {
+                    retry (3) {
                         try {
                             if (checkJobBuildRunned(jobName)) {
                                 error 'FAIL'
@@ -124,10 +124,9 @@ pipeline {
                             sleep(time:60,unit:"SECONDS")
                         }
 
-                        if (checkJobBuildRunned(jobName)) {
-                            error 'FAIL'
-                        }
-
+                    }
+                    if (checkJobBuildRunned(jobName)) {
+                        error 'FAIL'
                     }
                 }
             }
@@ -137,7 +136,6 @@ pipeline {
         stage('Prepare') {
             steps {
                 script {
-                    error 'FAIL'
                     // GIT submodule recursive checkout
                     scmInfo = checkout scm: [
                             $class: 'GitSCM',
