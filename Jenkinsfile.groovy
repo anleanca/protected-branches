@@ -142,8 +142,8 @@ pipeline {
                 // copy managed files to workspace
                 script {
                     def webhookUrl = "https://api.github.com"
-                    String sha = "a04ba25a8bb0553a6fa4bf084a0f44aa446b0ed3"
-                    String token = "20293a70e8ba83879b2814bebdc0da795ca169bc"
+                    String sha = "83731229b6624b26fe7a594cbeb6e96ca421a500"
+                    String token = "6bfe0edfbaaeb4da99d23b986dc1d1113f6c2506"
                     String repo_name = "anleanca/protected-branches"
 
                     String payload = """{
@@ -152,7 +152,7 @@ pipeline {
 }
 """
                 withCredentials([[$class: 'StringBinding', credentialsId: gitHubCredentialsId, variable: 'TOKEN']]) {
-                    def response = httpRequest url: "${webhookUrl}/repos/${repo_name}/statuses/${sha}?token=${env.TOKEN}",
+                    def response = httpRequest url: "${webhookUrl}/repos/${repo_name}/statuses/${sha}?token=${token}",
                         httpMode: 'POST',
                         acceptType: 'APPLICATION_JSON',
                         contentType: 'APPLICATION_JSON',
