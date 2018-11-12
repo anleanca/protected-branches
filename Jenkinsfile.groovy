@@ -241,8 +241,12 @@ pipeline {
                             echo 'Run integration tests'
                         },
                         "Sonar Scan": {
+                            branchName =  URLDecoder.decode("${env.JOB_NAME}", "UTF-8");
+                            branchName = branchName.replaceAll('/','-')
+                            echo branchName
+
                             withSonarQubeEnv('sonar'){
-                                sh "mvn sonar:sonar"
+                                sh "mvn sonar:sonar -Dsonar.projectName=${env.JOB_NAME} -Dsonar.projectKey=${branchName}"
                             }
                         }
                 )
