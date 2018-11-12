@@ -231,22 +231,42 @@ pipeline {
         }
 
         stage('Quality Analysis') {
-            parallel {
-                stage("Integration Test") {
-                    steps {
-                        echo 'Run integration tests'
-                    }
-                }
-
-                stage("Sonar Scan") {
-                    steps {
-                        withSonarQubeEnv(installationName: "$sonarConfig") {
+            steps {
+                /**
+                 * makes use of one single agent, and spins off 2 runs of the steps inside each parallel branch
+                 */
+                parallel(
+                        "Integration Test": {
+                            echo 'Run integration tests'
+                        },
+                        "Sonar Scan": {
+                            //withSonarQubeEnv(installationName:'sonar') {
                             sh "mvn sonar:sonar"
+                            //}
                         }
-                    }
-                }
+                )
             }
         }
+/**
+ stage('Transfer Script') {steps {// provide SSH credentials to builds via a ssh-agent in Jenkins
+ sshagent(['test-key']) {sh "scp test.sh ${identity}:${path}"}}}/**/
+/**
+ stage('Execute Script') {steps {script {// provide SSH credentials to builds via a ssh-agent in Jenkins
+ sshagent(['test-key']) {// AWS credentials binding - each binding will define an environment variable active within the scope of the step
+ withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
+ accessKeyVariable: 'AWS_ACCESS_KEY',
+ credentialsId: 'test',
+ secretKeyVariable: 'AWS_SECRET_KEY']]) {sh """
+ ssh ${identity} "chmod 755 test.sh && ./test.sh --aws-access-key ${AWS_ACCESS_KEY} " \
+ "--aws-secret-key ${AWS_SECRET_KEY}"
+ """}}}}}/**/
+/**
+ stage('Collect Reports') {steps {echo "Reports directory: ${workspace}/target/view"
+ zip dir: "${workspace}/target", zipFile: "$reportZipFile" // Create a zip file of content in the workspace}}stage('Archive reports in S3') {steps {// withAWS step provides authorization for the nested steps
+ withAWS(region: 'us-east-1', profile: '') {// Upload a file/folder from the workspace to an S3 bucket
+ s3Upload(file: "$reportZipFile",
+ bucket: '',
+ path: "$s3ReportPath")}}}/**/
 
         /**
          * post section defines actions which will be run at the end of the Pipeline run or stage
@@ -315,6 +335,5 @@ pipeline {
             timeout(time: 60,
                     unit: 'MINUTES')
         }
-
     }
 }
