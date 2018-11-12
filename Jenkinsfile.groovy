@@ -45,6 +45,8 @@ def publishHTMLReports(reportName) {
 
 
 String jobName = "bps-reporting-db"
+String gitHubCredentialsId = "352dfae7-1f12-40ad-b64c-c69162beecdb"
+
 
 def checkJobBuildRunned(jobName) {
 
@@ -149,13 +151,14 @@ pipeline {
   description:"Jenkins build"
 }
 """
-
-                    def response = httpRequest url: "${webhookUrl}/repos/${repo_name}/statuses/${sha}?token=${token}",
+                withCredentials([[$class: 'StringBinding', credentialsId: gitHubCredentialsId, variable: 'TOKEN']]) {
+                    def response = httpRequest url: "${webhookUrl}/repos/${repo_name}/statuses/${sha}?token=${env.TOKEN}",
                         httpMode: 'POST',
                         acceptType: 'APPLICATION_JSON',
                         contentType: 'APPLICATION_JSON',
                         requestBody: payload
                     println(response)
+                }
                     
                     if(params.USE_INPUT_DUNS) {
                         configFileProvider([configFile(fileId: '609999e4-446c-4705-a024-061ed7ca2a11',
