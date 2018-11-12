@@ -142,8 +142,6 @@ pipeline {
                 // copy managed files to workspace
                 
                     def webhookUrl = "https://api.github.com"
-                    String sha = "83731229b6624b26fe7a594cbeb6e96ca421a500"
-                    String token = "6bfe0edfbaaeb4da99d23b986dc1d1113f6c2506"
                     String repo_name = "anleanca/protected-branches"
 
                     String payload = """{"state": "success", "description": "Jenkins build"}"""
@@ -156,9 +154,10 @@ pipeline {
                         customHeaders:[[name:"Authorization", value: "token ${env.TOKEN}"]],
                         requestBody: payload
                     println(response)
-                /**/
+                /**
                 echo "${BUILD_URL}"
                 sh "githubstatus.py --token ${env.TOKEN} --repo ${githubRepositoryName}  status --status=success --sha ${scmInfo.GIT_COMMIT}"
+                /**/
             }                    
                     
                     if(params.USE_INPUT_DUNS) {
