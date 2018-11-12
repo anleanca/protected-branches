@@ -123,11 +123,11 @@ pipeline {
          */
         stage('Prepare') {
             steps {
-
-                println(checkJobBuildRunned(jobName))
-                def scmInfo = null
-                // GIT submodule recursive checkout
-                scmInfo = checkout scm: [
+                script {
+                    println(checkJobBuildRunned(jobName))
+                    def scmInfo = null
+                    // GIT submodule recursive checkout
+                    scmInfo = checkout scm: [
                         $class: 'GitSCM',
                         branches: scm.branches,
                         doGenerateSubmoduleConfigurations: false,
@@ -141,7 +141,7 @@ pipeline {
                         userRemoteConfigs: scm.userRemoteConfigs
                 ]
                 // copy managed files to workspace
-                script {
+                
                     def webhookUrl = "https://api.github.com"
                     String sha = "83731229b6624b26fe7a594cbeb6e96ca421a500"
                     String token = "6bfe0edfbaaeb4da99d23b986dc1d1113f6c2506"
