@@ -214,6 +214,7 @@ pipeline {
         // Run regardless of the completion status of the Pipeline run
         always {
             //
+            echo 'Run always'
         }
         // Only run the steps if the current Pipeline’s or stage’s run has a "success" status
         success {
