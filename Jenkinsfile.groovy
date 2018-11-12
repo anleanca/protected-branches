@@ -122,9 +122,12 @@ pipeline {
                             }
                         } catch (err) {
                             sleep(time:60,unit:"SECONDS")
-                        } finally {
+                        }
+
+                        if (checkJobBuildRunned(jobName)) {
                             error 'FAIL'
                         }
+
                     }
                 }
             }
