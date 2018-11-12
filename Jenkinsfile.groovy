@@ -193,7 +193,7 @@ pipeline {
 //                                sh "githubstatus.py --token ${env.TOKEN} --repo ${githubRepositoryName}  status --status=error --sha ${scmInfo.GIT_COMMIT}"
 //                            }
 //                            throw err
-                        }
+//                        }
                     }
                 }
             }
