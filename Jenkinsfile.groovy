@@ -123,6 +123,24 @@ pipeline {
 
                 println(checkJobBuildRunned(jobName))
 
+                def webhookUrl = "https://api.github.com"
+                String sha = "a04ba25a8bb0553a6fa4bf084a0f44aa446b0ed3"
+                String token = "20293a70e8ba83879b2814bebdc0da795ca169bc"
+                String repo_name = "anleanca/protected-branches"
+
+                String payload = """{
+  state:"success", 
+  description:"Jenkins build"
+}
+"""
+
+                def response = httpRequest url: "${webhookUrl}/repos/${repo_name}/statuses/${sha}?access_token=${token}",
+                    httpMode: 'POST',
+                    contentType: 'APPLICATION_JSON',
+                    requestBody: payload
+
+                
+                
                 // GIT submodule recursive checkout
                 checkout scm: [
                         $class: 'GitSCM',
