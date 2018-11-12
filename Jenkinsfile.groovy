@@ -114,8 +114,8 @@ pipeline {
          */
         stage('Check DB build') {
             steps {
-                script {
-                    retry (3) {
+                retry (3) {
+                    script {
                         try {
                             if (checkJobBuildRunned(jobName)) {
                                 error 'FAIL'
@@ -123,8 +123,9 @@ pipeline {
                         } catch (err) {
                             sleep(time:6,unit:"SECONDS")
                         }
-
                     }
+                }
+                script {
                     if (checkJobBuildRunned(jobName)) {
                         error 'FAIL'
                     }
