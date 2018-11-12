@@ -182,16 +182,17 @@ pipeline {
             steps {
                 script {
                     withMaven(globalMavenSettingsConfig: "$mavenConfig", jdk: "$JDKVersion" /*, maven: "$mavenLocation"*/) {
-                        try {
+                        error 'FAILURE'
+//                        try {
                             // -Dmaven.test.failure.ignore=true
                             // org.jacoco:jacoco-maven-plugin:prepare-agent
                             sh "mvn -B clean org.jacoco:jacoco-maven-plugin:prepare-agent test -Pci-env"
                             stash name: "unit_tests"
-                        } catch (err) {
-                            withCredentials([[$class: 'StringBinding', credentialsId: gitHubCredentialsId, variable: 'TOKEN']]) {
-                                sh "githubstatus.py --token ${env.TOKEN} --repo ${githubRepositoryName}  status --status=error --sha ${scmInfo.GIT_COMMIT}"
-                            }
-                            throw err
+//                        } catch (err) {
+//                            withCredentials([[$class: 'StringBinding', credentialsId: gitHubCredentialsId, variable: 'TOKEN']]) {
+//                                sh "githubstatus.py --token ${env.TOKEN} --repo ${githubRepositoryName}  status --status=error --sha ${scmInfo.GIT_COMMIT}"
+//                            }
+//                            throw err
                         }
                     }
                 }
