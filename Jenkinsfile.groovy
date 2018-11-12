@@ -135,7 +135,7 @@ pipeline {
                         userRemoteConfigs: scm.userRemoteConfigs
                 ]
                 // copy managed files to workspace
-                
+
                     def webhookUrl = "https://api.github.com"
                     String repo_name = "anleanca/protected-branches"
 
@@ -153,8 +153,8 @@ pipeline {
                 echo "${BUILD_URL}"
                 sh "githubstatus.py --token ${env.TOKEN} --repo ${githubRepositoryName}  status --status=success --sha ${scmInfo.GIT_COMMIT}"
                 /**/
-            }                    
-                    
+            }
+
                     if(params.USE_INPUT_DUNS) {
                         configFileProvider([configFile(fileId: '609999e4-446c-4705-a024-061ed7ca2a11',
                                 targetLocation: 'input/')]) {
@@ -291,8 +291,9 @@ pipeline {
                 }
             }
         }
+ /**/
     }
-/**/
+
 
     /**
      * post section defines actions which will be run at the end of the Pipeline run or stage
