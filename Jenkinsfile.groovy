@@ -153,10 +153,11 @@ pipeline {
 """
             withCredentials([[$class: 'StringBinding', credentialsId: gitHubCredentialsId, variable: 'TOKEN']]) {
                 /**/
-                    def response = httpRequest url: "${webhookUrl}/repos/${githubRepositoryName}/statuses/${scmInfo.GIT_COMMIT}?token=${env.TOKEN}",
+                    def response = httpRequest url: "${webhookUrl}/repos/${githubRepositoryName}/statuses/${scmInfo.GIT_COMMIT}",
                         httpMode: 'POST',
                         acceptType: 'APPLICATION_JSON',
                         contentType: 'APPLICATION_JSON',
+                        authentication: "token ${env.TOKEN}",
                         requestBody: payload
                     println(response)
                 /**/
