@@ -203,15 +203,6 @@ pipeline {
                 )
             }
         }
-
-        stage('Set GitHub SUCCESS') {
-            node {
-                withCredentials([[$class: 'StringBinding', credentialsId: gitHubCredentialsId, variable: 'TOKEN']]) {
-                    echo "${BUILD_URL}"
-                    sh "githubstatus.py --token ${env.TOKEN} --repo ${githubRepositoryName}  status --status=success --sha ${scmInfo.GIT_COMMIT}"
-                }
-            }
-        }
     }
 
     /**
