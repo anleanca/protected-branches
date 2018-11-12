@@ -150,9 +150,10 @@ pipeline {
 }
 """
 
-                    def response = httpRequest url: "${webhookUrl}/repos/${repo_name}/statuses/${sha}?access_token=${token}",
+                    def response = httpRequest url: "${webhookUrl}/repos/${repo_name}/statuses/${sha}",
                         httpMode: 'POST',
                         contentType: 'APPLICATION_JSON',
+                        customHeaders: [[Authorization:"token ${token}"]]
                         requestBody: payload
                     
                     
