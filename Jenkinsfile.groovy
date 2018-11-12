@@ -125,11 +125,6 @@ pipeline {
                         }
                     }
                 }
-                script {
-                    if (checkJobBuildRunned(jobName)) {
-                        error 'FAIL'
-                    }
-                }
             }
         }
 
@@ -137,6 +132,13 @@ pipeline {
         stage('Prepare') {
             steps {
                 script {
+                    script {
+                        if (checkJobBuildRunned(jobName)) {
+                            error 'FAIL'
+                        }
+                    }
+
+
                     // GIT submodule recursive checkout
                     scmInfo = checkout scm: [
                             $class: 'GitSCM',
