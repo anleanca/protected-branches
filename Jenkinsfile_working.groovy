@@ -10,6 +10,11 @@ def getMavenConfig() {
     return 'maven-config'
 }
 
+def getMavenLocation() {
+//    return 'M2_HOME'
+    return 'MAVEN_HOME'
+}
+
 def getEnvironment() {
     return  'QA\n' +
             'STG\n' +
@@ -241,7 +246,7 @@ pipeline {
                 )
             }
         }
-/**
+
         stage('Transfer Script') {
             steps {
                 // provide SSH credentials to builds via a ssh-agent in Jenkins
@@ -250,8 +255,7 @@ pipeline {
                 }
             }
         }
-/**/
-/**
+
         stage('Execute Script') {
             steps {
                 script {
@@ -271,8 +275,7 @@ pipeline {
                 }
             }
         }
-/**/
-/**
+
         stage('Collect Reports') {
             steps {
                 echo "Reports directory: ${workspace}/target/view"
@@ -292,7 +295,6 @@ pipeline {
             }
         }
     }
-/**/
 
     /**
      * post section defines actions which will be run at the end of the Pipeline run or stage
@@ -342,13 +344,11 @@ pipeline {
     }]
 }"""
                 // publish message to webhook
-                /*
                 httpRequest httpMode: 'POST',
                         acceptType: 'APPLICATION_JSON',
                         contentType: 'APPLICATION_JSON',
                         url: "${webhookUrl}",
                         requestBody: payload
-                */
             }
         }
     }
