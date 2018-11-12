@@ -237,20 +237,20 @@ pipeline {
                  * makes use of one single agent, and spins off 2 runs of the steps inside each parallel branch
                  */
                 parallel(
-                        "Integration Test": {
-                            echo 'Run integration tests'
-                        },
-                        "Sonar Scan": {
-                            step {
+                    "Integration Test": {
+                        echo 'Run integration tests'
+                    },
+                    "Sonar Scan": {
+                        script {
+                            withSonarQubeEnv('sonar') {
                                 branchName = URLDecoder.decode("${env.JOB_NAME}", "UTF-8");
                                 branchName = branchName.replaceAll('/', '-')
                                 echo branchName
 
-                                withSonarQubeEnv('sonar') {
-                                    sh "mvn sonar:sonar -Dsonar.projectName=${env.JOB_NAME} -Dsonar.projectKey=${branchName}"
-                                }
+                                sh "mvn sonar:sonar -Dsonar.projectName=${env.JOB_NAME} -Dsonar.projectKey=${branchName}"
                             }
                         }
+                    }
                 )
             }
         }
