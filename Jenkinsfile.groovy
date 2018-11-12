@@ -217,13 +217,10 @@ pipeline {
         // Only run the steps if the current Pipeline’s or stage’s run has a "success" status
         success {
             script {
-                def webhookUrl = "https://api.github.com"
-                String repo_name = "anleanca/protected-branches"
-
                 String payload = """{"state": "success", "description": "Jenkins build"}"""
                 withCredentials([[$class: 'StringBinding', credentialsId: gitHubCredentialsId, variable: 'TOKEN']]) {
                     /**/
-                    def response = httpRequest url: "${webhookUrl}/repos/${githubRepositoryName}/statuses/${scmInfo.GIT_COMMIT}",
+                    def response = httpRequest url: "https://api.github.com/repos/${githubRepositoryName}/statuses/${scmInfo.GIT_COMMIT}",
                             httpMode: 'POST',
                             acceptType: 'APPLICATION_JSON',
                             contentType: 'APPLICATION_JSON',
