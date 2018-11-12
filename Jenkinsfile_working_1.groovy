@@ -78,6 +78,17 @@ def checkJobBuildRunned(jobName) {
 
 /* Declarative pipeline must be enclosed within a pipeline block */
 pipeline {
+//    // agent section specifies where the entire Pipeline will execute in the Jenkins environment
+//    agent {
+//        /**
+//         * node allows for additional options to be specified
+//         * you can also specify label '' without the node option
+//         * if you want to execute the pipeline on any available agent use the option 'agent any'
+//         */
+//        node {
+//            label '' // Execute the Pipeline on an agent available in the Jenkins environment with the provided label
+//        }
+//    }
 
     agent any
 
@@ -94,14 +105,12 @@ pipeline {
      * parameters directive provides a list of parameters which a user should provide when triggering the Pipeline
      * some of the valid parameter types are booleanParam, choice, file, text, password, run, or string
      */
-    /**
     parameters {
         choice(choices: "$environment", description: '', name: 'ENVIRONMENT')
         string(defaultValue: "$emailRecipients",
                 description: 'List of email recipients',
                 name: 'EMAIL_RECIPIENTS')
     }
-     /**/
 
     /**
      * stages contain one or more stage directives
@@ -145,21 +154,56 @@ pipeline {
                                 customHeaders:[[name:"Authorization", value: "token ${env.TOKEN}"]],
                                 requestBody: payload
                         println(response)
+                        /**
+                         echo "${BUILD_URL}"
+                         sh "githubstatus.py --token ${env.TOKEN} --repo ${githubRepositoryName}  status --status=success --sha ${scmInfo.GIT_COMMIT}"
+                         /**/
+                    }
 
+                    if(params.USE_INPUT_DUNS) {
+                        configFileProvider([configFile(fileId: '609999e4-446c-4705-a024-061ed7ca2a11',
+                                targetLocation: 'input/')]) {
+                            echo 'Managed file copied to workspace'
+                        }
                     }
                 }
             }
         }
 
+        stage('User Input') {
+            // when directive allows the Pipeline to determine whether the stage should be executed depending on the given condition
+            // built-in conditions - branch, expression, allOf, anyOf, not etc.
+            when {
+                // Execute the stage when the specified Groovy expression evaluates to true
+                expression {
+                    return params.ENVIRONMENT ==~ /(?i)(STG|PRD)/
+                }
+            }
+            /**
+             * steps section defines a series of one or more steps to be executed in a given stage directive
+             */
+            steps {
+                // script step takes a block of Scripted Pipeline and executes that in the Declarative Pipeline
+                script {
+                    // This step pauses Pipeline execution and allows the user to interact and control the flow of the build.
+                    // Only a basic "process" or "abort" option is provided in the stage view
+                    input message: '', ok: 'Proceed',
+                            parameters: [
+                                    string(name: '', description: ''),
+                            ]
+                }
+            }
+        }
+
         stage('Maven version') {
+            steps {
+                echo "Hello, Maven"
+                sh "mvn --version" // Runs a Bourne shell script, typically on a Unix node
+            }
         }
 
         stage('Maven Install') {
             steps {
-                script {
-                    sh "mvn --version" // Runs a Bourne shell script, typically on a Unix node
-                }
-
                 script {
                     /**
                      * Override maven in this stage
@@ -175,10 +219,7 @@ pipeline {
                          * enclose this stage in a try-catch block
                          */
                         try {
-                            def pom = readMavenPom file: 'pom.xml'
-                            sh "mvn -B versions:set -DnewVersion=${pom.version}-${BUILD_NUMBER}"
-                            sh "mvn -B clean package -Dmaven.test.skip=true -Pci-env"
-                            stash name: "artifact"
+                            sh "mvn clean install"
                         } catch (Exception err) {
                             echo 'Maven clean install failed'
                             currentBuild.result = 'FAILURE'
