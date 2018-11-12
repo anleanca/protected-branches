@@ -151,9 +151,6 @@ pipeline {
             }
         }
 
-        stage('Maven version') {
-        }
-
         stage('Maven Install') {
             steps {
                 script {
