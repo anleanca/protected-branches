@@ -10,8 +10,9 @@ def getMavenConfig() {
     return 'maven-config'
 }
 
-def getSonarConfig() {
-    return 'sonar'
+def getMavenLocation() {
+//    return 'M2_HOME'
+    return 'MAVEN_HOME'
 }
 
 def getEnvironment() {
@@ -126,17 +127,17 @@ pipeline {
                     def scmInfo = null
                     // GIT submodule recursive checkout
                     scmInfo = checkout scm: [
-                            $class                           : 'GitSCM',
-                            branches                         : scm.branches,
+                            $class: 'GitSCM',
+                            branches: scm.branches,
                             doGenerateSubmoduleConfigurations: false,
-                            extensions                       : [[$class             : 'SubmoduleOption',
-                                                                 disableSubmodules  : false,
-                                                                 parentCredentials  : false,
-                                                                 recursiveSubmodules: true,
-                                                                 reference          : '',
-                                                                 trackingSubmodules : false]],
-                            submoduleCfg                     : [],
-                            userRemoteConfigs                : scm.userRemoteConfigs
+                            extensions: [[$class: 'SubmoduleOption',
+                                          disableSubmodules: false,
+                                          parentCredentials: false,
+                                          recursiveSubmodules: true,
+                                          reference: '',
+                                          trackingSubmodules: false]],
+                            submoduleCfg: [],
+                            userRemoteConfigs: scm.userRemoteConfigs
                     ]
                     // copy managed files to workspace
 
@@ -150,7 +151,7 @@ pipeline {
                                 httpMode: 'POST',
                                 acceptType: 'APPLICATION_JSON',
                                 contentType: 'APPLICATION_JSON',
-                                customHeaders: [[name: "Authorization", value: "token ${env.TOKEN}"]],
+                                customHeaders:[[name:"Authorization", value: "token ${env.TOKEN}"]],
                                 requestBody: payload
                         println(response)
                         /**
@@ -159,7 +160,7 @@ pipeline {
                          /**/
                     }
 
-                    if (params.USE_INPUT_DUNS) {
+                    if(params.USE_INPUT_DUNS) {
                         configFileProvider([configFile(fileId: '609999e4-446c-4705-a024-061ed7ca2a11',
                                 targetLocation: 'input/')]) {
                             echo 'Managed file copied to workspace'
@@ -240,58 +241,67 @@ pipeline {
                             echo 'Run integration tests'
                         },
                         "Sonar Scan": {
-                            //withSonarQubeEnv(installationName:'sonar') {
                             sh "mvn sonar:sonar"
-                            //}
                         }
                 )
             }
         }
-/**
- stage('Transfer Script') {steps {// provide SSH credentials to builds via a ssh-agent in Jenkins
- sshagent(['test-key']) {sh "scp test.sh ${identity}:${path}"}}}/**/
-/**
- stage('Execute Script') {steps {script {// provide SSH credentials to builds via a ssh-agent in Jenkins
- sshagent(['test-key']) {// AWS credentials binding - each binding will define an environment variable active within the scope of the step
- withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
- accessKeyVariable: 'AWS_ACCESS_KEY',
- credentialsId: 'test',
- secretKeyVariable: 'AWS_SECRET_KEY']]) {sh """
- ssh ${identity} "chmod 755 test.sh && ./test.sh --aws-access-key ${AWS_ACCESS_KEY} " \
- "--aws-secret-key ${AWS_SECRET_KEY}"
- """}}}}}/**/
-/**
- stage('Collect Reports') {steps {echo "Reports directory: ${workspace}/target/view"
- zip dir: "${workspace}/target", zipFile: "$reportZipFile" // Create a zip file of content in the workspace}}stage('Archive reports in S3') {steps {// withAWS step provides authorization for the nested steps
- withAWS(region: 'us-east-1', profile: '') {// Upload a file/folder from the workspace to an S3 bucket
- s3Upload(file: "$reportZipFile",
- bucket: '',
- path: "$s3ReportPath")}}}/**/
 
-        /**
-         * post section defines actions which will be run at the end of the Pipeline run or stage
-         * post section condition blocks: always, changed, failure, success, unstable, and aborted
-         */
-        post {
-            // Run regardless of the completion status of the Pipeline run
-            always {
-                // send email
-                // email template to be loaded from managed files
-                emailext body: '${SCRIPT,template="managed:EmailTemplate"}',
-                        attachLog: true,
-                        compressLog: true,
-                        attachmentsPattern: "$reportZipFile",
-                        mimeType: 'text/html',
-                        subject: "Pipeline Build ${BUILD_NUMBER}",
-                        to: "${params.EMAIL_RECIPIENTS}"
-
-                // clean up workspace
-                deleteDir()
+        stage('Transfer Script') {
+            steps {
+                // provide SSH credentials to builds via a ssh-agent in Jenkins
+                sshagent(['test-key']) {
+                    sh "scp test.sh ${identity}:${path}"
+                }
             }
-            // Only run the steps if the current Pipeline’s or stage’s run has a "success" status
-            success {
+        }
+
+        stage('Execute Script') {
+            steps {
                 script {
-                    def payload = """
+                    // provide SSH credentials to builds via a ssh-agent in Jenkins
+                    sshagent(['test-key']) {
+                        // AWS credentials binding - each binding will define an environment variable active within the scope of the step
+                        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
+                                          accessKeyVariable: 'AWS_ACCESS_KEY',
+                                          credentialsId: 'test',
+                                          secretKeyVariable: 'AWS_SECRET_KEY']]) {
+                            sh """
+                                ssh ${identity} "chmod 755 test.sh && ./test.sh --aws-access-key ${AWS_ACCESS_KEY} " \
+                                    "--aws-secret-key ${AWS_SECRET_KEY}"
+                            """
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
+    /**
+     * post section defines actions which will be run at the end of the Pipeline run or stage
+     * post section condition blocks: always, changed, failure, success, unstable, and aborted
+     */
+    post {
+        // Run regardless of the completion status of the Pipeline run
+        always {
+            // send email
+            // email template to be loaded from managed files
+            emailext body: '${SCRIPT,template="managed:EmailTemplate"}',
+                    attachLog: true,
+                    compressLog: true,
+                    attachmentsPattern: "$reportZipFile",
+                    mimeType: 'text/html',
+                    subject: "Pipeline Build ${BUILD_NUMBER}",
+                    to: "${params.EMAIL_RECIPIENTS}"
+
+            // clean up workspace
+            deleteDir()
+        }
+        // Only run the steps if the current Pipeline’s or stage’s run has a "success" status
+        success {
+            script {
+                def payload = """
 {
     "@type": "MessageCard",
     "@context": "http://schema.org/extensions",
@@ -315,25 +325,23 @@ pipeline {
         ]
     }]
 }"""
-                    // publish message to webhook
-                    /*
+                // publish message to webhook
                 httpRequest httpMode: 'POST',
                         acceptType: 'APPLICATION_JSON',
                         contentType: 'APPLICATION_JSON',
                         url: "${webhookUrl}",
                         requestBody: payload
-                */
-                }
             }
         }
-
-        // configure Pipeline-specific options
-        options {
-            // keep only last 10 builds
-            buildDiscarder(logRotator(numToKeepStr: '10'))
-            // timeout job after 60 minutes
-            timeout(time: 60,
-                    unit: 'MINUTES')
-        }
     }
+
+    // configure Pipeline-specific options
+    options {
+        // keep only last 10 builds
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+        // timeout job after 60 minutes
+        timeout(time: 60,
+                unit: 'MINUTES')
+    }
+
 }
