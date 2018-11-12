@@ -192,6 +192,7 @@ pipeline {
                     },
                     "Sonar Scan": {
                         script {
+                            unstash 'unit_tests'
                             withMaven(globalMavenSettingsConfig: "$mavenConfig", jdk: "$JDKVersion" /*, maven: "$mavenLocation"*/) {
                                 withSonarQubeEnv('sonar') {
                                     branchName = URLDecoder.decode("${env.JOB_NAME}", "UTF-8");
