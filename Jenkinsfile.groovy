@@ -123,7 +123,7 @@ pipeline {
                         } catch (err) {
                             sleep(time:6,unit:"SECONDS")
                         } finally {
-                            throw err
+                            error 'FAIL'
                         }
                     }
                 }
