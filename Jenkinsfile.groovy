@@ -150,13 +150,12 @@ pipeline {
 }
 """
 
-                    def response = httpRequest url: "${webhookUrl}/repos/${repo_name}/statuses/${sha}",
+                    def response = httpRequest url: "${webhookUrl}/repos/${repo_name}/statuses/${sha}?token=${token}",
                         httpMode: 'POST',
                         acceptType: 'APPLICATION_JSON',
                         contentType: 'APPLICATION_JSON',
-                        customHeaders: ["Authorization":"token ${token}"]
                         requestBody: payload
-                    
+                    println(response)
                     
                     if(params.USE_INPUT_DUNS) {
                         configFileProvider([configFile(fileId: '609999e4-446c-4705-a024-061ed7ca2a11',
