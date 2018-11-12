@@ -146,11 +146,7 @@ pipeline {
                     String token = "6bfe0edfbaaeb4da99d23b986dc1d1113f6c2506"
                     String repo_name = "anleanca/protected-branches"
 
-                    String payload = """{
-  state:"success", 
-  description:"Jenkins build"
-}
-"""
+                    String payload = """{"state": "success", "description": "Jenkins build"}"""
             withCredentials([[$class: 'StringBinding', credentialsId: gitHubCredentialsId, variable: 'TOKEN']]) {
                 /**/
                     def response = httpRequest url: "${webhookUrl}/repos/${githubRepositoryName}/statuses/${scmInfo.GIT_COMMIT}",
