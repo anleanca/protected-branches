@@ -121,7 +121,7 @@ pipeline {
                                 error 'FAIL'
                             }
                         } catch (err) {
-                            sleep(time:6,unit:"SECONDS")
+                            sleep(time:60,unit:"SECONDS")
                         } finally {
                             error 'FAIL'
                         }
@@ -236,7 +236,22 @@ pipeline {
             //
             echo 'Run always'
         }
-        // Only run the steps if the current Pipeline’s or stage’s run has a "success" status
+
+        failure {
+            script {
+                String payload = """{"state": "error", "description": "Jenkins build"}"""
+                withCredentials([[$class: 'StringBinding', credentialsId: gitHubCredentialsId, variable: 'TOKEN']]) {
+                    /**/
+                    def response = httpRequest url: "https://api.github.com/repos/${githubRepositoryName}/statuses/${scmInfo.GIT_COMMIT}",
+                            httpMode: 'POST',
+                            acceptType: 'APPLICATION_JSON',
+                            contentType: 'APPLICATION_JSON',
+                            customHeaders:[[name:"Authorization", value: "token ${env.TOKEN}"]],
+                            requestBody: payload
+                    println(response)
+                }
+        }
+
         success {
             script {
                 String payload = """{"state": "success", "description": "Jenkins build"}"""
