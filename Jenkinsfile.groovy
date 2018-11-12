@@ -137,6 +137,7 @@ pipeline {
         stage('Prepare') {
             steps {
                 script {
+                    error 'FAIL'
                     // GIT submodule recursive checkout
                     scmInfo = checkout scm: [
                             $class: 'GitSCM',
