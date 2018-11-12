@@ -192,12 +192,14 @@ pipeline {
                     },
                     "Sonar Scan": {
                         script {
-                            withSonarQubeEnv('sonar') {
-                                branchName = URLDecoder.decode("${env.JOB_NAME}", "UTF-8");
-                                branchName = branchName.replaceAll('/', '-')
-                                echo branchName
+                            withMaven(globalMavenSettingsConfig: "$mavenConfig", jdk: "$JDKVersion" /*, maven: "$mavenLocation"*/) {
+                                withSonarQubeEnv('sonar') {
+                                    branchName = URLDecoder.decode("${env.JOB_NAME}", "UTF-8");
+                                    branchName = branchName.replaceAll('/', '-')
+                                    echo branchName
 
-                                sh "mvn sonar:sonar -Dsonar.projectName=${env.JOB_NAME} -Dsonar.projectKey=${branchName}"
+                                    sh "mvn sonar:sonar -Dsonar.projectName=${env.JOB_NAME} -Dsonar.projectKey=${branchName}"
+                                }
                             }
                         }
                     }
