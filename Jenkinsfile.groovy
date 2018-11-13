@@ -121,7 +121,7 @@ pipeline {
                             echo "Fail"
                             sh 'echo "Fail!"; exit 1'
                         }
-                        sleep(time:6,unit:"SECONDS")
+                        sleep(time:120,unit:"SECONDS")
                     }
                 }
                 script {
@@ -187,6 +187,7 @@ pipeline {
                 script {
                     withMaven(globalMavenSettingsConfig: "$mavenConfig", jdk: "$JDKVersion" /*, maven: "$mavenLocation"*/) {
                         try {
+                            sh 'echo "Fail!"; exit 1'
                             // -Dmaven.test.failure.ignore=true
                             // org.jacoco:jacoco-maven-plugin:prepare-agent
                             sh "mvn -B clean org.jacoco:jacoco-maven-plugin:prepare-agent test -Pci-env"
