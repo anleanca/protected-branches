@@ -124,6 +124,11 @@ pipeline {
                         sleep(time:6,unit:"SECONDS")
                     }
                 }
+                script {
+                    if (checkJobBuildRunned(jobName)) {
+                        error 'FAIL'
+                    }
+                }
             }
         }
 
@@ -131,11 +136,6 @@ pipeline {
         stage('Prepare') {
             steps {
                 script {
-                    script {
-                        if (checkJobBuildRunned(jobName)) {
-                            error 'FAIL'
-                        }
-                    }
 
 
                     // GIT submodule recursive checkout
