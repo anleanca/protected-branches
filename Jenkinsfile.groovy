@@ -76,6 +76,15 @@ def checkJobBuildRunned(jobName) {
     return false
 }
 
+def updateGitHubStatus(githubRepoName, commitSha, dataToSend, authData) {
+    def response = httpRequest url: "https://api.github.com/repos/${githubRepoName}/statuses/${commitSha}",
+            httpMode: 'POST',
+            acceptType: 'APPLICATION_JSON',
+            contentType: 'APPLICATION_JSON',
+            customHeaders: authData,
+            requestBody: dataToSend
+    println(response)
+}
 
 /* Declarative pipeline must be enclosed within a pipeline block */
 pipeline {
@@ -187,7 +196,6 @@ pipeline {
                 script {
                     withMaven(globalMavenSettingsConfig: "$mavenConfig", jdk: "$JDKVersion" /*, maven: "$mavenLocation"*/) {
                         try {
-                            sh 'echo "Fail!"; exit 1'
                             // -Dmaven.test.failure.ignore=true
                             // org.jacoco:jacoco-maven-plugin:prepare-agent
                             sh "mvn -B clean org.jacoco:jacoco-maven-plugin:prepare-agent test -Pci-env"
@@ -262,14 +270,17 @@ pipeline {
                 if (scmInfo) {
                     String payload = """{"state": "success", "description": "Jenkins build"}"""
                     withCredentials([[$class: 'StringBinding', credentialsId: gitHubCredentialsId, variable: 'TOKEN']]) {
-                        /**/
-                        def response = httpRequest url: "https://api.github.com/repos/${githubRepositoryName}/statuses/${scmInfo.GIT_COMMIT}",
-                                httpMode: 'POST',
-                                acceptType: 'APPLICATION_JSON',
-                                contentType: 'APPLICATION_JSON',
-                                customHeaders: [[name: "Authorization", value: "token ${env.TOKEN}"]],
-                                requestBody: payload
-                        println(response)
+
+                        def authData = [[name: "Authorization", value: "token ${env.TOKEN}"]]
+                        updateGitHubStatus(githubRepositoryName, scmInfo.GIT_COMMIT, payload, authData)
+
+//                        def response = httpRequest url: "https://api.github.com/repos/${githubRepositoryName}/statuses/${scmInfo.GIT_COMMIT}",
+//                                httpMode: 'POST',
+//                                acceptType: 'APPLICATION_JSON',
+//                                contentType: 'APPLICATION_JSON',
+//                                customHeaders: [[name: "Authorization", value: "token ${env.TOKEN}"]],
+//                                requestBody: payload
+//                        println(response)
                     }
                 }
             }
