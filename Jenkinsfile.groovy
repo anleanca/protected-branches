@@ -117,6 +117,7 @@ pipeline {
                 retry (3) {
                     script {
                         try {
+                            echo "Retry"
                             if (checkJobBuildRunned(jobName)) {
                                 error 'FAIL'
                             }
