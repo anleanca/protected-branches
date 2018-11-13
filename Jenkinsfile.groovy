@@ -1,6 +1,3 @@
-def getProjectName() {
-    return 'JenkinsPipeline'
-}
 
 def getJDKVersion() {
     return 'jdk1.8'
@@ -252,7 +249,10 @@ pipeline {
                 if (scmInfo) {
                     String payload = """{"state": "error", "description": "Jenkins build"}"""
                     withCredentials([[$class: 'StringBinding', credentialsId: gitHubCredentialsId, variable: 'TOKEN']]) {
-                        /**/
+                        def authData = [[name: "Authorization", value: "token ${env.TOKEN}"]]
+                        updateGitHubStatus(githubRepositoryName, scmInfo.GIT_COMMIT, payload, authData)
+
+                        /**
                         def response = httpRequest url: "https://api.github.com/repos/${githubRepositoryName}/statuses/${scmInfo.GIT_COMMIT}",
                                 httpMode: 'POST',
                                 acceptType: 'APPLICATION_JSON',
@@ -260,6 +260,7 @@ pipeline {
                                 customHeaders: [[name: "Authorization", value: "token ${env.TOKEN}"]],
                                 requestBody: payload
                         println(response)
+                        /**/
                     }
                 }
             }
@@ -274,13 +275,15 @@ pipeline {
                         def authData = [[name: "Authorization", value: "token ${env.TOKEN}"]]
                         updateGitHubStatus(githubRepositoryName, scmInfo.GIT_COMMIT, payload, authData)
 
-//                        def response = httpRequest url: "https://api.github.com/repos/${githubRepositoryName}/statuses/${scmInfo.GIT_COMMIT}",
-//                                httpMode: 'POST',
-//                                acceptType: 'APPLICATION_JSON',
-//                                contentType: 'APPLICATION_JSON',
-//                                customHeaders: [[name: "Authorization", value: "token ${env.TOKEN}"]],
-//                                requestBody: payload
-//                        println(response)
+                        /**
+                        def response = httpRequest url: "https://api.github.com/repos/${githubRepositoryName}/statuses/${scmInfo.GIT_COMMIT}",
+                                httpMode: 'POST',
+                                acceptType: 'APPLICATION_JSON',
+                                contentType: 'APPLICATION_JSON',
+                                customHeaders: [[name: "Authorization", value: "token ${env.TOKEN}"]],
+                                requestBody: payload
+                        println(response)
+                        /**/
                     }
                 }
             }
