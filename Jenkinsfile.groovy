@@ -187,7 +187,6 @@ pipeline {
                 script {
                     withMaven(globalMavenSettingsConfig: "$mavenConfig", jdk: "$JDKVersion" /*, maven: "$mavenLocation"*/) {
                         try {
-                            error 'FAILURE'
                             // -Dmaven.test.failure.ignore=true
                             // org.jacoco:jacoco-maven-plugin:prepare-agent
                             sh "mvn -B clean org.jacoco:jacoco-maven-plugin:prepare-agent test -Pci-env"
