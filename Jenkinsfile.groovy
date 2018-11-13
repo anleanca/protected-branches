@@ -118,10 +118,10 @@ pipeline {
                     retry (3) {
                         echo "Retry"
                         if (checkJobBuildRunned(jobName)) {
+                            sleep(time:120,unit:"SECONDS")
                             echo "Fail"
                             sh 'echo "Fail!"; exit 1'
                         }
-                        sleep(time:120,unit:"SECONDS")
                     }
                 }
                 script {
