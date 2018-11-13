@@ -240,23 +240,23 @@ pipeline {
             echo 'Run always'
         }
 
-        failure {
-            script {
-                if (scmInfo) {
-                    String payload = """{"state": "error", "description": "Jenkins build"}"""
-                    withCredentials([[$class: 'StringBinding', credentialsId: gitHubCredentialsId, variable: 'TOKEN']]) {
-                        /**/
-                        def response = httpRequest url: "https://api.github.com/repos/${githubRepositoryName}/statuses/${scmInfo.GIT_COMMIT}",
-                                httpMode: 'POST',
-                                acceptType: 'APPLICATION_JSON',
-                                contentType: 'APPLICATION_JSON',
-                                customHeaders: [[name: "Authorization", value: "token ${env.TOKEN}"]],
-                                requestBody: payload
-                        println(response)
-                    }
-                }
-            }
-        }
+//        failure {
+//            script {
+//                if (scmInfo) {
+//                    String payload = """{"state": "error", "description": "Jenkins build"}"""
+//                    withCredentials([[$class: 'StringBinding', credentialsId: gitHubCredentialsId, variable: 'TOKEN']]) {
+//                        /**/
+//                        def response = httpRequest url: "https://api.github.com/repos/${githubRepositoryName}/statuses/${scmInfo.GIT_COMMIT}",
+//                                httpMode: 'POST',
+//                                acceptType: 'APPLICATION_JSON',
+//                                contentType: 'APPLICATION_JSON',
+//                                customHeaders: [[name: "Authorization", value: "token ${env.TOKEN}"]],
+//                                requestBody: payload
+//                        println(response)
+//                    }
+//                }
+//            }
+//        }
 
         success {
             script {
