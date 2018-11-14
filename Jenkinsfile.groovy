@@ -244,6 +244,9 @@ pipeline {
         }
 
         stage('Artifact upload') {
+            when {
+                environment name: 'DEPLOY_TO_NEXUS', value: 'true'
+            }
             steps {
                 script {
 
