@@ -247,7 +247,7 @@ pipeline {
                     unstash 'artifact'
 
                     def pom = readMavenPom file: 'pom.xml'
-
+                    println(pom)
                     def file = "${pom.artifactId}-${pom.version}"
 //                    def file = "${pom.artifactId}-${artifactVersion}"
                     def jar = "target/${file}.jar"
