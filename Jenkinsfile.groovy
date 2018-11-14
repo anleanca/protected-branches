@@ -247,7 +247,7 @@ pipeline {
                     def pom = readMavenPom file: 'pom.xml'
 
 //                    def file = "${pom.artifactId}-${pom.version}"
-                    def file = "${artifactVersion}"
+                    def file = "${pom.artifactId}-${artifactVersion}"
                     def jar = "target/${file}.jar"
 
                     sh "cp pom.xml ${file}.pom"
