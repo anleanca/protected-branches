@@ -179,10 +179,10 @@ pipeline {
                     withMaven(globalMavenSettingsConfig: "$mavenConfig", jdk: "$JDKVersion" /*, maven: "$mavenLocation"*/) {
                         try {
                             def pom = readMavenPom file: 'pom.xml'
-                            artifactVersion = "${pom.version}.${BUILD_NUMBER}".replace("-SNAPSHOT","")+"-SNAPSHOT"
+//                            artifactVersion = "${pom.version}.${BUILD_NUMBER}".replace("-SNAPSHOT","")+"-SNAPSHOT"
 //                            artifactVersion = "${pom.version}.${BUILD_NUMBER}"
-                            sh "mvn -B versions:set -DnewVersion=${artifactVersion} -Pci-env"
-//                            sh "mvn -B versions:set -DnewVersion=${pom.version}-${BUILD_NUMBER} -Pci-env"
+//                            sh "mvn -B versions:set -DnewVersion=${artifactVersion} -Pci-env"
+                            sh "mvn -B versions:set -DnewVersion=${pom.version}-${BUILD_NUMBER} -Pci-env"
                             sh "mvn -B clean package -Dmaven.test.skip=true -Pci-env"
                             stash name: "artifact"
                         } catch (Exception err) {
@@ -248,8 +248,8 @@ pipeline {
 
                     def pom = readMavenPom file: 'pom.xml'
 
-//                    def file = "${pom.artifactId}-${pom.version}"
-                    def file = "${pom.artifactId}-${artifactVersion}"
+                    def file = "${pom.artifactId}-${pom.version}"
+//                    def file = "${pom.artifactId}-${artifactVersion}"
                     def jar = "target/${file}.jar"
 
                     sh "cp pom.xml ${file}.pom"
@@ -286,8 +286,8 @@ pipeline {
                             nexusVersion: 'nexus3',
                             protocol: 'http',
                             repository: 'ansible-meetup',
-                            version: "${artifactVersion}".replace("-SNAPSHOT","")
-//                            version: "${pom.version}"
+//                            version: "${artifactVersion}".replace("-SNAPSHOT","")
+                            version: "${pom.version}"
 
                 }
             }
