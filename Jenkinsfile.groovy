@@ -178,7 +178,8 @@ pipeline {
                     withMaven(globalMavenSettingsConfig: "$mavenConfig", jdk: "$JDKVersion" /*, maven: "$mavenLocation"*/) {
                         try {
                             def pom = readMavenPom file: 'pom.xml'
-                            sh "mvn -B versions:set -DnewVersion=${pom.version}-${BUILD_NUMBER}"
+                            String artifactVersion = "${pom.version}-${BUILD_NUMBER}".replace("-SNAPSHOT","")+"-SNAPSHOT"
+                            sh "mvn -B versions:set -DnewVersion=${artifactVersion}"
                             sh "mvn -B clean package -Dmaven.test.skip=true -Pci-env"
                             stash name: "artifact"
                         } catch (Exception err) {
