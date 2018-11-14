@@ -287,8 +287,8 @@ pipeline {
                             protocol: 'http',
                             repository: 'ansible-meetup',
 //                            version: "${artifactVersion}".replace("-SNAPSHOT","")
-//                            version: "${pom.version}"
-                            version: "${pom.version}.${BUILD_NUMBER}".replace("-SNAPSHOT","")+"-SNAPSHOT"
+                            version: "${pom.version}"
+//                            version: "${pom.version}.${BUILD_NUMBER}".replace("-SNAPSHOT","")+"-SNAPSHOT"
 
                 }
             }
