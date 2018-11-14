@@ -46,7 +46,8 @@ String gitHubCredentialsId = "352dfae7-1f12-40ad-b64c-c69162beecdb"
 String githubRepositoryName = "anleanca/protected-branches"
 
 String nexusCredentialsId = "7d0e985d-2969-45b3-a0d5-2b0f74444bc7"
-final NEXUS_URL = '192.168.33.20:8081'
+String NEXUS_URL = '192.168.33.20:8081'
+String NEXUS_REPOSITORY = "ansible-meetup"
 
 String artifactVersion = ""
 
@@ -287,11 +288,8 @@ pipeline {
                             nexusUrl: NEXUS_URL,
                             nexusVersion: 'nexus3',
                             protocol: 'http',
-                            repository: 'ansible-meetup',
-//                            version: "${artifactVersion}".replace("-SNAPSHOT","")
+                            repository: NEXUS_REPOSITORY,
                             version: "${pom.version}"
-//                            version: "${pom.version}.${BUILD_NUMBER}".replace("-SNAPSHOT","")+"-SNAPSHOT"
-
                 }
             }
         }
