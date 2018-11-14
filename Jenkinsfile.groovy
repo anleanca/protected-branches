@@ -45,6 +45,10 @@ String jobName = "bps-reporting-db"
 String gitHubCredentialsId = "352dfae7-1f12-40ad-b64c-c69162beecdb"
 String githubRepositoryName = "anleanca/protected-branches"
 
+String nexusCredentialsId = "7d0e985d-2969-45b3-a0d5-2b0f74444bc7"
+final NEXUS_URL = '192.168.33.20:8081'
+
+
 def scmInfo = null
 
 def checkJobBuildRunned(jobName) {
@@ -229,6 +233,56 @@ pipeline {
                         }
                     }
                 )
+            }
+        }
+    }
+
+    stage('Artifact upload') {
+        steps {
+            script {
+
+                unstash 'artifact'
+
+                def pom = readMavenPom file: 'pom.xml'
+                def file = "${pom.artifactId}-${pom.version}"
+                def jar = "target/${file}.jar"
+
+                sh "cp pom.xml ${file}.pom"
+/*
+                nexusArtifactUploader {
+                    nexusVersion('nexus3')
+                    protocol('http')
+                    nexusUrl('192.168.33.20:8081')
+                    groupId("${pom.groupId}")
+                    version('2.4')
+                    repository('ansible-meetup')
+                    credentialsId(nexusCredentialsId)
+                    artifact {
+                        artifactId("${pom.artifactId}")
+                        type('jar')
+                        classifier('debug')
+                        file('nexus-artifact-uploader.jar')
+                    }
+                    artifact {
+                        artifactId('nexus-artifact-uploader')
+                        type('hpi')
+                        classifier('debug')
+                        file('nexus-artifact-uploader.hpi')
+                    }
+                }
+*/
+                nexusArtifactUploader artifacts: [
+                        [artifactId: "${pom.artifactId}", classifier: '', file: "target/${file}.jar", type: 'jar'],
+                        [artifactId: "${pom.artifactId}", classifier: '', file: "${file}.pom", type: 'pom']
+                ],
+                        credentialsId: nexusCredentialsId,
+                        groupId: "${pom.groupId}",
+                        nexusUrl: NEXUS_URL,
+                        nexusVersion: 'nexus3',
+                        protocol: 'http',
+                        repository: 'ansible-meetup',
+                        version: "${pom.version}"
+
             }
         }
     }
