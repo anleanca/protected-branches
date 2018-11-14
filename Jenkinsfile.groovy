@@ -188,7 +188,7 @@ pipeline {
 //                            sh "mvn -B versions:set -DnewVersion=${pom.version}-${BUILD_NUMBER} -Pci-env"
                             sh "mvn -B clean package -Dmaven.test.skip=true -Pci-env"
 
-                            sh "rm ${pom.artifactId}-${artifactVersion}.pom"
+                            sh "ls -la"
 //                            pitest-sample-0.0.1-SNAPSHOT.pom
                             stash name: "artifact"
                         } catch (Exception err) {
