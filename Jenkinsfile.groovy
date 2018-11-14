@@ -235,19 +235,18 @@ pipeline {
                 )
             }
         }
-    }
 
-    stage('Artifact upload') {
-        steps {
-            script {
+        stage('Artifact upload') {
+            steps {
+                script {
 
-                unstash 'artifact'
+                    unstash 'artifact'
 
-                def pom = readMavenPom file: 'pom.xml'
-                def file = "${pom.artifactId}-${pom.version}"
-                def jar = "target/${file}.jar"
+                    def pom = readMavenPom file: 'pom.xml'
+                    def file = "${pom.artifactId}-${pom.version}"
+                    def jar = "target/${file}.jar"
 
-                sh "cp pom.xml ${file}.pom"
+                    sh "cp pom.xml ${file}.pom"
 /*
                 nexusArtifactUploader {
                     nexusVersion('nexus3')
@@ -271,21 +270,23 @@ pipeline {
                     }
                 }
 */
-                nexusArtifactUploader artifacts: [
-                        [artifactId: "${pom.artifactId}", classifier: '', file: "target/${file}.jar", type: 'jar'],
-                        [artifactId: "${pom.artifactId}", classifier: '', file: "${file}.pom", type: 'pom']
-                ],
-                        credentialsId: nexusCredentialsId,
-                        groupId: "${pom.groupId}",
-                        nexusUrl: NEXUS_URL,
-                        nexusVersion: 'nexus3',
-                        protocol: 'http',
-                        repository: 'ansible-meetup',
-                        version: "${pom.version}"
+                    nexusArtifactUploader artifacts: [
+                            [artifactId: "${pom.artifactId}", classifier: '', file: "target/${file}.jar", type: 'jar'],
+                            [artifactId: "${pom.artifactId}", classifier: '', file: "${file}.pom", type: 'pom']
+                    ],
+                            credentialsId: nexusCredentialsId,
+                            groupId: "${pom.groupId}",
+                            nexusUrl: NEXUS_URL,
+                            nexusVersion: 'nexus3',
+                            protocol: 'http',
+                            repository: 'ansible-meetup',
+                            version: "${pom.version}"
 
+                }
             }
         }
     }
+
 
     /**
      * post section defines actions which will be run at the end of the Pipeline run or stage
