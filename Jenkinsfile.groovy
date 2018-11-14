@@ -286,7 +286,7 @@ pipeline {
                             nexusVersion: 'nexus3',
                             protocol: 'http',
                             repository: 'ansible-meetup',
-                            version: "${artifactVersion}"
+                            version: "${artifactVersion}".replace("-SNAPSHOT","")
 //                            version: "${pom.version}"
 
                 }
