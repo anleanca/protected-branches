@@ -48,6 +48,7 @@ String githubRepositoryName = "anleanca/protected-branches"
 String nexusCredentialsId = "7d0e985d-2969-45b3-a0d5-2b0f74444bc7"
 final NEXUS_URL = '192.168.33.20:8081'
 
+String artifactVersion = ""
 
 def scmInfo = null
 
@@ -178,7 +179,7 @@ pipeline {
                     withMaven(globalMavenSettingsConfig: "$mavenConfig", jdk: "$JDKVersion" /*, maven: "$mavenLocation"*/) {
                         try {
                             def pom = readMavenPom file: 'pom.xml'
-                            String artifactVersion = "${pom.version}-${BUILD_NUMBER}".replace("-SNAPSHOT","")+"-SNAPSHOT"
+                            artifactVersion = "${pom.version}-${BUILD_NUMBER}".replace("-SNAPSHOT","")+"-SNAPSHOT"
                             sh "mvn -B versions:set -DnewVersion=${artifactVersion}"
                             sh "mvn -B clean package -Dmaven.test.skip=true -Pci-env"
                             stash name: "artifact"
@@ -244,7 +245,9 @@ pipeline {
                     unstash 'artifact'
 
                     def pom = readMavenPom file: 'pom.xml'
-                    def file = "${pom.artifactId}-${pom.version}"
+
+//                    def file = "${pom.artifactId}-${pom.version}"
+                    def file = "${artifactVersion}"
                     def jar = "target/${file}.jar"
 
                     sh "cp pom.xml ${file}.pom"
