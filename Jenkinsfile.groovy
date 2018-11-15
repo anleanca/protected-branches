@@ -287,7 +287,7 @@ pipeline {
 */
                     nexusArtifactUploader artifacts: [
                             [artifactId: "${pom.artifactId}", classifier: '', file: "target/${file}.jar", type: 'jar'],
-                            [artifactId: "${pom.artifactId}", classifier: '', file: "${file}.pom", type: 'pom']
+//                            [artifactId: "${pom.artifactId}", classifier: '', file: "${file}.pom", type: 'pom']
                     ],
                             credentialsId: nexusCredentialsId,
                             groupId: "${pom.groupId}",
@@ -364,8 +364,7 @@ pipeline {
         // keep only last 10 builds
         buildDiscarder(logRotator(numToKeepStr: '10'))
         // timeout job after 60 minutes
-        timeout(time: 60,
-                unit: 'MINUTES')
+        timeout(time: 60, unit: 'MINUTES')
     }
 
 }
